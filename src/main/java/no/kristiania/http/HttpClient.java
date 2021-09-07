@@ -11,7 +11,7 @@ public class HttpClient {
         Socket socket = new Socket("httpbin.org", 80);
 
         socket.getOutputStream().write(
-                ("Get /html HTTP/1.1\r\n" +
+                ("GET /html HTTP/1.1\r\n" +
                         "Host: httbin.org\r\n" +
                         "\r\n").getBytes()
         );
