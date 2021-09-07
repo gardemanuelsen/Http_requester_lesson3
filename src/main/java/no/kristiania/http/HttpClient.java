@@ -1,3 +1,5 @@
+package no.kristiania.http;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -23,3 +25,4 @@ public class HttpClient {
     }
 
 }
+
