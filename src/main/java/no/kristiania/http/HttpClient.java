@@ -6,12 +6,20 @@ import java.net.Socket;
 
 public class HttpClient {
 
+    public HttpClient(String host, int port, String requestTarget) {
+
+    }
+
     public static void main(String[] args) throws IOException {
 
-        Socket socket = new Socket("httpbin.org", 80);
 
+        Socket socket = new Socket("httpbin.org", 80);
+        String request = "";
+        socket.getOutputStream().write(request.getBytes());
+
+        //noinspection TextBlockMigration
         socket.getOutputStream().write(
-                ("Get /html HTTP/1.1\r\n" +
+                ("GET /html HTTP/1.1\r\n" +
                         "Host: httbin.org\r\n" +
                         "\r\n").getBytes()
         );
@@ -24,5 +32,9 @@ public class HttpClient {
         }
     }
 
+    public static int getStatusCode() {
+        return 0;
+
+    }
 }
 
