@@ -5,66 +5,60 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.util.HashMap;
 
+
+
 public class HttpClient {
 
     private final int statusCode;
     private final HashMap<String, String> headerFields = new HashMap<>();
-    private final String messageBody;
 
     public HttpClient(String host, int port, String requestTarget) throws IOException {
         Socket socket = new Socket(host, port);
-        socket.getOutputStream().write(("GET " + requestTarget + " HTTP/1.1\r\nHost: " + host + "\r\n\r\n").getBytes());
 
-        String[] statusLine = readLine(socket.getInputStream()).split(" ");
-        statusCode = Integer.parseInt(statusLine[1]);
+        String request = "GET " + requestTarget + " HTTP/1.1\r\n"+
+                "Host: " + host +  "\r\n"+
+                "Connection: close\r\n"+
+                "\r\n";
+                socket.getOutputStream().write(request.getBytes());
+
+
+        String statusLine = readLine(socket);
+        this.statusCode = Integer.parseInt(statusLine.split(" ")[1]);
 
         String headerField;
-        while (!(headerField = readLine(socket.getInputStream())).isBlank()) {
+
+        while(!(headerField = readLine(socket)).isBlank()){
             int colonPos = headerField.indexOf(':');
-            headerFields.put(headerField.substring(0, colonPos), headerField.substring(colonPos+1).trim());
+            headerFields.put(headerField.substring(0,colonPos), headerField.substring(colonPos+1).trim());
         }
-        this.messageBody = readBytes(socket.getInputStream(), getContentLength());
+
     }
 
-    private String readBytes(InputStream in, int contentLength) throws IOException {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < contentLength; i++) {
-            result.append((char)in.read());
-        }
-        return result.toString();
-    }
+    private String readLine(Socket socket) throws IOException {
+        StringBuilder buffer = new StringBuilder();
+        InputStream in = socket.getInputStream();
 
-    private String readLine(InputStream in) throws IOException {
-        StringBuilder result = new StringBuilder();
         int c;
-        while ((c = in.read()) != -1 && c != '\r') {
-            result.append((char)c);
+        while((c = in.read()) != -1 && c != '\r') {
+            buffer.append((char) c);
         }
-        if (c == '\r') {
-            in.read();
-        }
-        return result.toString();
+            int expectedNewLine = socket.getInputStream().read();
+            assert expectedNewLine == '\n';
+            return buffer.toString();
     }
 
-    public int getStatusCode() {
+
+
+    public int getStatusCode () {
         return statusCode;
     }
 
-    public String getHeader(String fieldName) {
-        return headerFields.get(fieldName);
+    public String getHeader(String headerName){
+        return headerFields.get(headerName);
     }
 
     public int getContentLength() {
         return Integer.parseInt(getHeader("Content-Length"));
     }
-
-    public String getMessageBody() {
-        return messageBody;
-    }
-
-    public static void main(String[] args) throws IOException {
-        HttpClient client = new HttpClient("httpbin.org", 80, "/html");
-        System.out.println(client.getMessageBody());
-    }
-
 }
+
