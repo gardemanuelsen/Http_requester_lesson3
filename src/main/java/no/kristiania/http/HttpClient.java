@@ -25,16 +25,6 @@ public class HttpClient {
 
     }
 
-    private String readCharacters(Socket socket, int contentLength) throws IOException {
-        StringBuilder result = new StringBuilder();
-        InputStream in = socket.getInputStream();
-
-        for (int i = 0; i < contentLength; i++) {
-            result.append((char) in.read());
-        }
-
-        return result.toString();
-    }
 
     private String readLine(Socket socket) throws IOException {
         StringBuilder result = new StringBuilder();
