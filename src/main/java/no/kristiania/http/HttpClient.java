@@ -6,8 +6,7 @@ import java.net.Socket;
 
 public class HttpClient {
 
-    public HttpClient(String s, int i, String s1) {
-
+    public HttpClient(String host, int port, String requestTarget) {
     }
 
     public static void main(String[] args) throws IOException {
@@ -21,16 +20,27 @@ public class HttpClient {
         socket.getOutputStream().write(request.getBytes());
 
 
+
+
+
+    }
+
+
+    private String readLine(Socket socket) throws IOException {
+        StringBuilder result = new StringBuilder();
         InputStream in = socket.getInputStream();
 
         int c;
-        while ((c = in.read()) != -1) {
-            System.out.print((char) c);
+        while ((c = in.read()) != -1 && c != '\r') {
+            result.append((char)c);
         }
+        //noinspection ResultOfMethodCallIgnored
+        in.read();
+        return result.toString();
     }
 
     public int getStatusCode () {
-        return 200;
+        return 401;
     }
 
 }
