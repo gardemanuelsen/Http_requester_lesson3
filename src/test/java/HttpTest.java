@@ -1,20 +1,38 @@
 import no.kristiania.http.HttpClient;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HttpTest {
+class HttpClientTest {
 
     @Test
-    void shouldGetSuccessfulResponseCode() {
-        HttpClient client = new HttpClient("httpbin.org", 80, "/html");
+    void shouldGetResponseCode() throws IOException {
+        HttpClient client = new HttpClient("httpbin.org", 80, "/status/200");
         assertEquals(200, client.getStatusCode());
+        client = new HttpClient("httpbin.org", 80, "/status/400");
+        assertEquals(400, client.getStatusCode());
     }
 
     @Test
-    void shouldGetFailureResponseCode() {
-        HttpClient client = new HttpClient("httpbin.org", 80, "/status/403");
-        assertEquals(401, client.getStatusCode());
+    void shouldReadHeaders() throws IOException {
+        HttpClient client = new HttpClient("httpbin.org", 80, "/html");
+        assertEquals("text/html; charset=utf-8", client.getHeader("Content-Type"));
     }
 
+    @Test
+    void shouldReadContentLength() throws IOException {
+        HttpClient client = new HttpClient("httpbin.org", 80, "/html");
+        assertTrue(client.getContentLength() > 10);
+    }
+
+    @Test
+    void shouldReadMessageBody() throws IOException {
+        HttpClient client = new HttpClient("httpbin.org", 80, "/html");
+        assertTrue(client.getMessageBody().startsWith("<!DOCTYPE html>\n<html>"),
+                "expected <" + client.getMessageBody() + " to be html"
+        );
+    }
 }
